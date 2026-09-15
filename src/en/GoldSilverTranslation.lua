@@ -1,4 +1,4 @@
--- {"id":94621783,"ver":"1.0.0","libVer":"1.0.0","author":"OpenAI","repo":"","dep":[]}
+-- {"id":94621783,"ver":"1.1.0","libVer":"1.0.0","author":"OpenAI","repo":"","dep":[]}
 
 local id = 94621783
 local baseURL = "https://goldsilvertranslation.wordpress.com"
@@ -243,7 +243,24 @@ local function apiURL(page)
         .. "&page=" .. tostring(page)
         .. "&order=ASC"
         .. "&order_by=date"
-        .. "&fields=ID,title,URL,date"
+        .. "&category=douluo-dalu-4"
+        .. "&fields=ID,title,URL,date,slug"
+end
+
+local function chapterNumberFor(post, title)
+    -- Most posts begin with the number, but Goldsilver's chapters 573, 874,
+    -- and 908 use inconsistent titles. Their slugs still contain the number.
+    return tonumber(title:match("^%s*(%d+)"))
+        or tonumber(title:match("^%s*[Cc]hapter%s+(%d+)"))
+        or tonumber((post.slug or ""):match("^(%d+)%-"))
+end
+
+local function normaliseChapterTitle(title, chapterNumber)
+    title = title:gsub("^%s*[Cc]hapter%s+", "")
+    if not title:match("^%s*" .. tostring(chapterNumber) .. "%f[^%d]") then
+        return tostring(chapterNumber) .. " – " .. title
+    end
+    return title
 end
 
 local function fetchChapterData()
@@ -271,11 +288,11 @@ local function fetchChapterData()
     local parsed = {}
     for _, post in ipairs(rawPosts) do
         local title = htmlToText(post.title or "")
-        local chapterNumber = tonumber(title:match("^%s*(%d+)"))
+        local chapterNumber = chapterNumberFor(post, title)
         if chapterNumber and chapterNumber >= firstGoldSilverChapter and post.URL then
             parsed[#parsed + 1] = {
                 number = chapterNumber,
-                title = title,
+                title = normaliseChapterTitle(title, chapterNumber),
                 link = shrinkURL(post.URL),
                 release = releaseDate(post.date)
             }
@@ -309,31 +326,30 @@ local function fetchChapterData()
     return AsList(chapters)
 end
 
-local function removeIfPresent(parent, selector)
-    local node = parent:selectFirst(selector)
-    while node do
-        node:remove()
-        node = parent:selectFirst(selector)
-    end
-end
-
 local function parsePassage(chapterURL)
-    local doc = GETDocument(expandURL(chapterURL))
-    local content = doc:selectFirst("article .entry-content")
-        or doc:selectFirst(".entry-content")
+    local cleanURL = (chapterURL or ""):gsub("[?#].*$", ""):gsub("/+$", "")
+    local slug = cleanURL:match("/([^/]+)$")
+
+    if not slug or slug == "" then
+        error("Gold Silver Translation: could not identify the chapter URL")
+    end
+
+    -- The public page's theme markup changes depending on the client and was
+    -- the cause of the old 'could not find chapter content' error. Fetch the
+    -- post's rendered HTML directly from WordPress instead.
+    local apiDoc = GETDocument(apiBase .. "slug:" .. slug .. "?fields=content")
+    local data = decodeJSON(apiDoc:text())
+
+    if not data or not data.content or data.content == "" then
+        error("Gold Silver Translation: WordPress returned no chapter content")
+    end
+
+    local doc = Document('<div id="shosetsu-passage">' .. data.content .. "</div>")
+    local content = doc:selectFirst("#shosetsu-passage")
 
     if not content then
         error("Gold Silver Translation: could not find chapter content")
     end
-
-    -- WordPress/Jetpack clutter that should not be part of the reader text.
-    removeIfPresent(content, "#jp-post-flair")
-    removeIfPresent(content, ".sharedaddy")
-    removeIfPresent(content, ".sd-sharing-enabled")
-    removeIfPresent(content, ".jp-relatedposts")
-    removeIfPresent(content, "script")
-    removeIfPresent(content, "style")
-    removeIfPresent(content, "form")
 
     return pageOfElem(content)
 end

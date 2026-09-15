@@ -1,11 +1,26 @@
-# Gold Silver Translation — Shosetsu extension
+# Personal Shosetsu extensions
 
-A small Shosetsu repository containing an extension for:
+This repository contains extensions for:
 
-- **Site:** https://goldsilvertranslation.wordpress.com/
-- **Novel:** *Douluo Dalu 4: Ultimate Fighting* (DD4)
+- **Gold Silver Translation:** *Douluo Dalu 4: Ultimate Fighting* (DD4)
+- **TRI-HERMES:** *Fate/strange Fake*
 
-## Why it uses the WordPress API
+## Fate/strange Fake
+
+The *Fate/strange Fake* extension presents each volume as a separate Shosetsu
+book with its own official cover. Each book contains properly separated,
+reflowable chapters from TRI-HERMES and preserves the available volume front
+matter and inline light-novel illustrations.
+
+The original TRI-HERMES pages link their artwork directly from Imgur, which is
+blocked in the UK. The extension therefore reads TRI-HERMES' rendered GitHub
+source, where GitHub's image mirror serves the same full-resolution artwork.
+
+TRI-HERMES currently contains complete translations of Volumes 1–6 and only
+the opening portion of Volume 7. The Volume 7 entries are explicitly labelled
+as partial in Shosetsu.
+
+## Why DD4 uses the WordPress API
 
 Gold Silver Translation's visible `Douluo Dalu 4 – Chapter List` page is stale and stops in the 300s. The extension therefore reads the site's public WordPress.com posts API, requests only posts in the site's `Douluo Dalu 4` category, and builds the chapter list dynamically. New chapters should appear when Shosetsu refreshes the novel.
 
@@ -25,8 +40,12 @@ Shosetsu repositories need to be reachable over HTTP; it cannot use this ZIP dir
    README.md
    res/
      dd4-cover.jpg
+     fate-strange-fake-vol-1.jpg
+     ...
+     fate-strange-fake-vol-7.jpg
    src/
      en/
+       FateStrangeFake.lua
        GoldSilverTranslation.lua
    ```
 
@@ -39,14 +58,14 @@ Shosetsu repositories need to be reachable over HTTP; it cannot use this ZIP dir
    ```
 
 6. Refresh Shosetsu's repositories/extensions list.
-7. Install **Gold Silver Translation**.
-8. Open the extension and select **Douluo Dalu 4: Ultimate Fighting**.
+7. Install **Gold Silver Translation** and/or **Fate/strange Fake (TRI-HERMES)**.
+8. Open the relevant extension and select its novel.
 
 ## Updating
 
 You should not need to edit the extension as new DD4 chapters are posted. The chapter list is generated from the live WordPress.com API each time Shosetsu refreshes the novel.
 
-When replacing an older version of this extension, update both `index.json` and `src/en/GoldSilverTranslation.lua`, then refresh the repository and update/reinstall the extension in Shosetsu.
+When replacing an older version of an extension, update both `index.json` and its corresponding file in `src/en/`, then refresh the repository and update/reinstall the extension in Shosetsu.
 
 ## Notes
 

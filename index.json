@@ -10,6 +10,16 @@
       "ver": "1.4.0",
       "libVer": "1.0.0",
       "md5": ""
+    },
+    {
+      "name": "Fate/strange Fake (TRI-HERMES)",
+      "fileName": "FateStrangeFake",
+      "imageURL": "https://raw.githubusercontent.com/AppleFox-read/shosetsu-goldsilver/main/res/fate-strange-fake-vol-1.jpg",
+      "id": 94621784,
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": ""
     }
   ],
   "styles": []

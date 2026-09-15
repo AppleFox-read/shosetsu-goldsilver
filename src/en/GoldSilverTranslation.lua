@@ -1,9 +1,10 @@
--- {"id":94621783,"ver":"1.3.0","libVer":"1.0.0","author":"OpenAI","repo":"","dep":[]}
+-- {"id":94621783,"ver":"1.4.0","libVer":"1.0.0","author":"OpenAI","repo":"","dep":[]}
 
 local id = 94621783
 local baseURL = "https://goldsilvertranslation.wordpress.com"
 local apiBase = "https://public-api.wordpress.com/rest/v1.1/sites/goldsilvertranslation.wordpress.com/posts/"
 local chapterListURL = "/douluo-dalu-4/"
+local novelCoverURL = "https://raw.githubusercontent.com/AppleFox-read/shosetsu-goldsilver/main/res/dd4-cover.jpg"
 local pageSize = 100
 
 -- Gold Silver Translation picked up DD4 from chapter 269.
@@ -401,6 +402,7 @@ end
 local function parseNovel(_, loadChapters)
     local info = NovelInfo {
         title = "Douluo Dalu 4: Ultimate Fighting",
+        imageURL = novelCoverURL,
         status = NovelStatus.PUBLISHING,
         description = "Gold Silver Translation's English fan translation of Douluo Dalu 4. Chapters are loaded directly from the site's public WordPress post feed rather than its outdated static chapter-list page."
     }
@@ -416,7 +418,8 @@ local function listing()
     return {
         Novel {
             title = "Douluo Dalu 4: Ultimate Fighting",
-            link = chapterListURL
+            link = chapterListURL,
+            imageURL = novelCoverURL
         }
     }
 end
